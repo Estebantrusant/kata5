@@ -5,21 +5,28 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import software.ulpgc.kata5.architecture.io.Store;
+import software.ulpgc.kata5.architecture.model.Movie;
 import software.ulpgc.kata5.architecture.viewmodel.Histogram;
+import software.ulpgc.kata5.architecture.viewmodel.HistogramBuilder;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.stream.Stream;
 
 public class Desktop extends JFrame {
-    private Desktop() throws HeadlessException {
+    private final Store store;
+
+    private Desktop(Store store) throws HeadlessException {
+        this.store = store;
         this.setTitle("Histogram");
         this.setResizable(false);
         this.setSize(800, 600);
         this.setLocationRelativeTo(null);
     }
 
-    public static Desktop create() {
-        return new Desktop();
+    public static Desktop create(Store store) throws HeadlessException {
+        return new Desktop(store);
     }
 
     public Desktop display(Histogram histogram) {
@@ -53,4 +60,18 @@ public class Desktop extends JFrame {
         }
         return xySeries;
     }
+    private Histogram histogram() {
+        return HistogramBuilder
+                .with(movies())
+                .title("Movies per year")
+                .x("Year")
+                .y("Count")
+                .legend("Movies")
+                .use(Movie::year);
+    }
+
+    private Stream<Movie> movies() {
+        return store.movies();
+    }
+
 }
