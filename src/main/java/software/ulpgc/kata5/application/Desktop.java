@@ -30,7 +30,7 @@ public class Desktop extends JFrame {
     }
 
     public Desktop display() {
-        this.getContentPane().add(chartPnaleWith(histogram));
+        this.getContentPane().add(chartPnaleWith(histogram()));
         return this;
     }
 
