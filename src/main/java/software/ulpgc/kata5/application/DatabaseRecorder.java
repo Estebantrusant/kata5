@@ -12,7 +12,7 @@ public class DatabaseRecorder implements Recorder {
     private final Connection connection;
     private final PreparedStatement statement;
 
-    public DatabaseRecorder(Connection connection, PreparedStatement statement) throws SQLException {
+    public DatabaseRecorder(Connection connection) throws SQLException {
         this.connection = connection;
         this.createTableIfNotExists();
         this.statement = connection.prepareStatement("INSERT INTO movies (title, year, duration) VALUES (?, ?, ?)");

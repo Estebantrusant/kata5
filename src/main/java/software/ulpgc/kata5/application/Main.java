@@ -4,26 +4,27 @@ import software.ulpgc.kata5.architecture.model.Movie;
 import software.ulpgc.kata5.architecture.viewmodel.Histogram;
 import software.ulpgc.kata5.architecture.viewmodel.HistogramBuilder;
 
+import javax.swing.table.TableRowSorter;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.stream.Stream;
 
 public class Main {
-    public static void main(String[] args) {
-        Desktop.create().display(histogram()).setVisible(true);
+    public static void main(String[] args) throws SQLException {
+        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:movies.db")) {
+            connection.setAutoCommit(false);
+            importIfNeededInto(connection);
+            Desktop.create(new DatabaseStore(connection))
+                    .display()
+                    .setVisible(true);
+        }
     }
 
-    private static Histogram histogram() {
-        return HistogramBuilder
-                .with(movies())
-                .title("Movies per year")
-                .x("Year")
-                .y("Count")
-                .legend("Movies")
-                .use(Movie::year);
-    }
-
-    private static Stream<Movie> movies() {
-        return new RemoteStore(MovieDeserializer::fromTsv)
-                .movies()
-                .limit(1000);
+    private static void importIfNeededInto(Connection connection) throws SQLException {
+        if(new File("movies.csv").length() > 0) {return;}
+        Stream<Movie> movies = new RemoteStore(MovieDeserializer::fromTsv).movies();
+        new DatabaseRecorder(connection).record(movies);
     }
 }
