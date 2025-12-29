@@ -23,7 +23,7 @@ public class Main {
     }
 
     private static void importIfNeededInto(Connection connection) throws SQLException {
-        if(new File("movies.csv").length() > 0) {return;}
+        if(new File("movies.db").length() > 0) {return;}
         Stream<Movie> movies = new RemoteStore(MovieDeserializer::fromTsv).movies();
         new DatabaseRecorder(connection).record(movies);
     }
